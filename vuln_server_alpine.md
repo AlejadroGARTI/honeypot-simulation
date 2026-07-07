@@ -1,5 +1,35 @@
 Entorno en 
+```bash
 
+         ──────────────────────────────────────────────────────────────────────────────────────────
+                                                ┌────────┐     ┌────────┐
+                                                │        │     │ WEB    │
+                                       ((WB-1)) │        │     │        │ ((WB-2))
+                                                └───┬────┘     └───┬────┘ 
+                                                    │              │
+                                                ┌───▼────┐     ┌───▼────┐
+                                       ((MD-2)) │        │     │ php    │ ((middleware 2))  
+                                ┌─────────┐     └───┬────┘     └───┬────┘ 
+                       ((MD-1)) │         │         │ pt. 80       │ pt. 50000
+                                └────┬────┘         └──────┬───────┘
+                                     │ pt. 22              │ 
+                                ┌────▼────┐           ┌────▼────┐               
+                      ((COM-1)) │         │           │  OS aLPINE   │ ((middleware))          
+                                └─────────┘           └─────────┘      
+                                     │                     │      
+                                     └──────────┼──────────┘
+                                                │
+                                        ┌───────▼───────┐
+        ────────────────────────────────│ Container     │─────────────────────(   )──────────
+                                        └───────────────┘                       │
+                                                                                │ VPN directo al puerto de ubuntu con conexión a 
+                                                                                │ internet  
+                                        ┌───────────────┐                       │
+                         ((AC-1)) ──────│ Ubuntu server │ ((SO-1))     ──────────
+                                        └───────────────┘
+                                        
+```
+System information
 ```bash
 docker-server login: agarti
 Password:
@@ -55,25 +85,56 @@ agarti@docker-server:~$ ip a
 agarti@docker-server:~$
 
 ```
-
+Mounting the honeypot
 ```bash
 agarti@docker-server:~$ groups agarti
 agarti : agarti adm cdrom sudo dip plugdev users lxd docker
 
-agarti@docker-server:~$ docker run -d --name vuln_server alpine tail -f /dev/null
-Unable to find image 'alpine:latest' locally
-latest: Pulling from library/alpine
-55afa1ecc21d: Pull complete
-56dceff11b33: Download complete
-f5124fb579e2: Download complete
-Digest: sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
-Status: Downloaded newer image for alpine:latest
-a9fcad33c38b4e081a952b637c1a0b32adfaa718d651f585970ccb1a05111ace
+agarti@docker-server:~$ mkdir -p honeypot
 
-agarti@docker-server:~$ docker --version
-Docker version 29.1.3, build 29.1.3-0ubuntu4.1
-
-agarti@docker-server:~$ docker ps
-CONTAINER ID   IMAGE     COMMAND               CREATED         STATUS         PORTS     NAMES
-a9fcad33c38b   alpine    "tail -f /dev/null"   3 minutes ago   Up 3 minutes             vuln_server
+agarti@docker-server:~/honeypot$ nano docker-compose.yml
 ```
+
+```bash
+agarti@docker-server:~/honeypot$ cat docker-compose.yml
+version: '3'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: honey_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password_secure
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_password
+
+  wordpress:
+    image: wordpress:latest
+    container_name: honey_wordpress
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_password
+      WORDPRESS_DB_NAME: wordpress
+```
+
+```bash
+agarti@docker-server:~/honeypot$ docker compose up -d
+WARN[0000] /home/agarti/honeypot/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion
+[+] Running 41/41
+ ✔ db Pulled                                                                      104.1s
+ ✔ wordpress Pulled                                                               109.3s
+
+[+] Running 3/3
+ ✔ Network honeypot_default   Created                                               0.6s
+ ✔ Container honey_mysql      Started                                               1.2s
+ ✔ Container honey_wordpress  Started                                               0.7s
+ ```
+
+http://192.168.184.135:8080/wp-admin/install.php
