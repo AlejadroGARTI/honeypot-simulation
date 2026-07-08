@@ -188,4 +188,109 @@ MAC Address: 00:0C:29:EB:57:BF (VMware)
 
 Nmap done: 1 IP address (1 host up) scanned in 5.37 seconds
  ```
+```bash
+┌──(kali㉿kali)-[~]
+└─$ wpscan --url http://192.168.184.135 --enumerate u --user-agent "wpscan"  
+_______________________________________________________________
+         __          _______   _____
+         \ \        / /  __ \ / ____|
+          \ \  /\  / /| |__) | (___   ___  __ _ _ __ ®
+           \ \/  \/ / |  ___/ \___ \ / __|/ _` | '_ \
+            \  /\  /  | |     ____) | (__| (_| | | | |
+             \/  \/   |_|    |_____/ \___|\__,_|_| |_|
 
+         WordPress Security Scanner by the WPScan Team
+                         Version 3.8.28
+                               
+       @_WPScan_, @ethicalhack3r, @erwan_lr, @firefart
+_______________________________________________________________
+
+[i] Updating the Database ...
+[i] Update completed.
+
+[+] URL: http://192.168.184.135/ [192.168.184.135]
+[+] Started: Wed Jul  8 13:59:13 2026
+
+Interesting Finding(s):
+
+[+] Headers
+ | Interesting Entries:
+ |  - Server: Apache/2.4.38 (Debian)
+ |  - X-Powered-By: PHP/7.4.16
+ | Found By: Headers (Passive Detection)
+ | Confidence: 100%
+
+[+] robots.txt found: http://192.168.184.135/robots.txt
+ | Interesting Entries:
+ |  - /wp-admin/
+ |  - /wp-admin/admin-ajax.php
+ | Found By: Robots Txt (Aggressive Detection)
+ | Confidence: 100%
+
+[+] XML-RPC seems to be enabled: http://192.168.184.135/xmlrpc.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+ | References:
+ |  - http://codex.wordpress.org/XML-RPC_Pingback_API
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_ghost_scanner/
+ |  - https://www.rapid7.com/db/modules/auxiliary/dos/http/wordpress_xmlrpc_dos/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_xmlrpc_login/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_pingback_access/
+
+[+] WordPress readme found: http://192.168.184.135/readme.html
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+
+[+] The external WP-Cron seems to be enabled: http://192.168.184.135/wp-cron.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 60%
+ | References:
+ |  - https://www.iplocation.net/defend-wordpress-from-ddos
+ |  - https://github.com/wpscanteam/wpscan/issues/1299
+
+[+] WordPress version 7.0 identified (Latest, released on 2026-05-20).
+ | Found By: Rss Generator (Passive Detection)
+ |  - http://192.168.184.135/feed/, <generator>https://wordpress.org/?v=7.0</generator>
+ |  - http://192.168.184.135/comments/feed/, <generator>https://wordpress.org/?v=7.0</generator>
+
+[+] WordPress theme in use: twentytwentyone
+ | Location: http://192.168.184.135/wp-content/themes/twentytwentyone/
+ | Last Updated: 2026-05-20T00:00:00.000Z
+ | Readme: http://192.168.184.135/wp-content/themes/twentytwentyone/readme.txt
+ | [!] The version is out of date, the latest version is 2.8
+ | Style URL: http://192.168.184.135/wp-content/themes/twentytwentyone/style.css?ver=1.1
+ | Style Name: Twenty Twenty-One
+ | Style URI: https://wordpress.org/themes/twentytwentyone/
+ | Description: Twenty Twenty-One is a blank canvas for your ideas and it makes the block editor your best brush. Wi...
+ | Author: the WordPress team
+ | Author URI: https://wordpress.org/
+ |
+ | Found By: Css Style In Homepage (Passive Detection)
+ | Confirmed By: Css Style In 404 Page (Passive Detection)
+ |
+ | Version: 1.1 (80% confidence)
+ | Found By: Style (Passive Detection)
+ |  - http://192.168.184.135/wp-content/themes/twentytwentyone/style.css?ver=1.1, Match: 'Version: 1.1'
+
+[+] Enumerating Users (via Passive and Aggressive Methods)
+ Brute Forcing Author IDs - Time: 00:00:00 <=========================> (10 / 10) 100.00% Time: 00:00:00
+
+[i] User(s) Identified:
+
+[+] admin
+ | Found By: Author Posts - Author Pattern (Passive Detection)
+ | Confirmed By:
+ |  Rss Generator (Passive Detection)
+ |  Rss Generator (Aggressive Detection)
+
+[!] No WPScan API Token given, as a result vulnerability data has not been output.
+[!] You can get a free API token with 25 daily requests by registering at https://wpscan.com/register
+
+[+] Finished: Wed Jul  8 13:59:21 2026
+[+] Requests Done: 65
+[+] Cached Requests: 8
+[+] Data Sent: 12.488 KB
+[+] Data Received: 24.122 MB
+[+] Memory used: 210.328 MB
+[+] Elapsed time: 00:00:07
+ ```
