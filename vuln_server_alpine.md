@@ -96,32 +96,56 @@ agarti@docker-server:~/honeypot$ nano docker-compose.yml
 ```
 
 ```bash
-agarti@docker-server:~/honeypot$ cat docker-compose.yml
-version: '3'
+agarti@docker-server:/opt/honeypot$ cat docker-compose.yml
+version: '3.8'
 
 services:
-  db:
+  db_trampa:
     image: mysql:8.0
-    container_name: honey_mysql
+    container_name: honeypot_mysql
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: password_secure
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wp_user
-      MYSQL_PASSWORD: wp_password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - honeypot_db_data:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
-  wordpress:
-    image: wordpress:latest
-    container_name: honey_wordpress
+  wp_trampa:
+    image: wordpress:5.6
+    container_name: honeypot_wordpress
     restart: always
     ports:
-      - "8080:80"
+      - "80:80"
     depends_on:
-      - db
+      - db_trampa
     environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_USER: wp_user
-      WORDPRESS_DB_PASSWORD: wp_password
-      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_HOST: db_trampa
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+    volumes:
+      - honeypot_wp_data:/var/www/html
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+volumes:
+  honeypot_db_data:
+  honeypot_wp_data:
 ```
 
 ```bash
@@ -136,5 +160,32 @@ WARN[0000] /home/agarti/honeypot/docker-compose.yml: the attribute `version` is 
  ✔ Container honey_mysql      Started                                               1.2s
  ✔ Container honey_wordpress  Started                                               0.7s
  ```
+Antes y después del firewall
+```bash                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ nmap 192.168.184.135        
+Starting Nmap 7.99 ( https://nmap.org ) at 2026-07-08 12:38 +0200
+Nmap scan report for 192.168.184.135
+Host is up (0.00011s latency).
+Not shown: 998 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 00:0C:29:EB:57:BF (VMware)
 
-http://192.168.184.135:8080/wp-admin/install.php
+Nmap done: 1 IP address (1 host up) scanned in 0.81 seconds
+                                                                                                       
+┌──(kali㉿kali)-[~]
+└─$ nmap 192.168.184.135 
+Starting Nmap 7.99 ( https://nmap.org ) at 2026-07-08 12:39 +0200
+Nmap scan report for 192.168.184.135
+Host is up (0.00047s latency).
+Not shown: 998 filtered tcp ports (no-response)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 00:0C:29:EB:57:BF (VMware)
+
+Nmap done: 1 IP address (1 host up) scanned in 5.37 seconds
+ ```
+
