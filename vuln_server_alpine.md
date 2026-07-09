@@ -27,7 +27,28 @@ Entorno en
                                         ┌───────────────┐                       │
                          ((AC-1)) ──────│ Ubuntu server │ ((SO-1))     ──────────
                                         └───────────────┘
-                                        
+
+
+```text
+```
+```bash
+                                ARQUITECTURA DE INFRAESTRUCTURA (Flujo de Izquierda a Derecha)
+
+  [ TRÁFICO EXTERNO ] 
+          │
+          ▼
+   ┌──────────────┐      ┌───────────────┐      ┌───────────────┐      ┌──────────────────────────────┐
+   │  UFW         │ pt.22│ Ubuntu Server │      │  Docker Engine│      │  Contenedores / Servicios    │
+   │  (Firewall)  ├─────►│ (S.O. Base)   ├─────►│  (Host)       ├─────►│                              │
+   └──────────────┘      └───────────────┘      └───────────────┘      └──────────────┬───────────────┘
+          │                                                                           │
+          │ (pt. 80 / 443)                                                            ├──► [ BBDD (MySQL/MariaDB) ]
+          ▼                                                                           │
+   ┌──────────────┐                                                                   └──► [ WordPress (Sitio Web) ]
+   │  WF          │                                                                             │
+   │  (Wordfence) │◄────────────────────────────────────────────────────────────────────────────┘
+   └──────────────┘ (Filtrado de Aplicación / Retorno)
+                      
 ```
 System information
 ```bash
