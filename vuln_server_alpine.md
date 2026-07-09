@@ -106,8 +106,38 @@ agarti@docker-server:~$ ip a
 agarti@docker-server:~$
 
 ```
-Mounting the honeypot
+
+ 
 ```bash
+Mounting the honeypot
+sudo apt install docker.io docker-compose -y
+
+server@server:/opt/honeypot$ sudo systemctl enable docker
+server@server:/opt/honeypot$ sudo systemctl start docker
+server@server:/opt/honeypot$ sudo systemctl status docker
+● docker.service - Docker Application Container Engine
+     Loaded: loaded (/usr/lib/systemd/system/docker.servi>
+     Active: active (running) since Thu 2026-07-09 10:55:>
+ Invocation: 417e1ce322574d98b26e89eb3a332ac2
+
+
+
+drwxr-xr-x  4 root root 4096 Jul  9 12:47 .
+drwxr-xr-x 20 root root 4096 Jul  9 10:39 ..
+drwx--x--x  4 root root 4096 Jul  9 10:55 containerd
+drwxr-xr-x  2 root root 4096 Jul  9 12:47 server_prod
+server@server:/opt$ sudo chown -R $USER:$USER /opt/server_prod/
+server@server:/opt$ ls -la
+total 16
+drwxr-xr-x  4 root   root   4096 Jul  9 12:47 .
+drwxr-xr-x 20 root   root   4096 Jul  9 10:39 ..
+drwx--x--x  4 root   root   4096 Jul  9 10:55 containerd
+drwxr-xr-x  2 server server 4096 Jul  9 12:47 server_prod
+server@server:/opt$
+
+
+
+sudo usermod -aG docker $USER
 agarti@docker-server:~$ groups agarti
 agarti : agarti adm cdrom sudo dip plugdev users lxd docker
 
@@ -315,3 +345,4 @@ Interesting Finding(s):
 [+] Memory used: 210.328 MB
 [+] Elapsed time: 00:00:07
  ```
+sudo timedatectl set-ntp true
